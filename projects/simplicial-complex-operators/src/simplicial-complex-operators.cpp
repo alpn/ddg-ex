@@ -183,8 +183,24 @@ MeshSubset SimplicialComplexOperators::star(const MeshSubset& subset) const {
  */
 MeshSubset SimplicialComplexOperators::closure(const MeshSubset& subset) const {
 
-    // TODO
-    return subset; // placeholder
+    auto closure(subset);
+
+    for(auto e : subset.edges){
+        for(auto v : mesh->edge(e).adjacentVertices()){
+            closure.vertices.insert(v.getIndex());
+        }
+    }
+
+    for(auto f : subset.faces){
+        for(auto v : mesh->face(f).adjacentVertices()){
+            closure.vertices.insert(v.getIndex());
+        }
+        for(auto e : mesh->face(f).adjacentEdges()){
+            closure.edges.insert(e.getIndex());
+        }
+    }
+
+    return closure;
 }
 
 /*

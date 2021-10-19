@@ -211,8 +211,16 @@ MeshSubset SimplicialComplexOperators::closure(const MeshSubset& subset) const {
  */
 MeshSubset SimplicialComplexOperators::link(const MeshSubset& subset) const {
 
-    // TODO
-    return subset; // placeholder
+    auto st = star(subset);
+    auto cl = closure(subset);
+
+    auto stcl = star(cl);
+    auto clst = closure(st);
+
+    auto sub = clst.deepCopy();
+    sub.deleteSubset(stcl);
+
+    return sub;
 }
 
 /*

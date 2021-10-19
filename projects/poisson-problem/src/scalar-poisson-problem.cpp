@@ -26,6 +26,7 @@ Vector<double> ScalarPoissonProblem::solve(const Vector<double>& rho) const {
 
     SparseMatrix<double> matrix = this->A;
 
+    assert(0!=totalArea);
     double rhoBarVal = ((M*rho) / totalArea).sum();
     Vector<double> rhoBar = Vector<double>::Constant(rho.size(), rhoBarVal);
 

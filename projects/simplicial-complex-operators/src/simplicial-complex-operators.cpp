@@ -267,8 +267,51 @@ bool SimplicialComplexOperators::isComplex(const MeshSubset& subset) const {
  */
 int SimplicialComplexOperators::isPureComplex(const MeshSubset& subset) const {
 
-    // TODO
-    return -1; // placeholder
+    if(false == isComplex(subset)){
+        return -1;
+    }
+
+    if(0 == subset.faces.size() && 0 == subset.edges.size()){
+        return 0;
+    }
+
+    for(auto v : subset.vertices){
+
+        bool contained = false;
+
+        for(auto e : mesh->vertex(v).adjacentEdges()){
+            if(subset.edges.count(e.getIndex())){
+                contained = true;
+                break;
+            }
+        }
+
+        if(!contained){
+            return -1;
+        }
+    }
+
+    if(0 == subset.faces.size()){
+        return 1;
+    }
+
+    for(auto e : subset.edges){
+
+        bool contained = false;
+
+        for(auto f : mesh->edge(e).adjacentFaces()){
+            if(subset.faces.count(f.getIndex())){
+                contained = true;
+                break;
+            }
+        }
+
+        if(!contained){
+            return -1;
+        }
+    }
+
+    return 2;
 }
 
 /*

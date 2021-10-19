@@ -244,8 +244,17 @@ Vector3 VertexPositionGeometry::vertexNormalAreaWeighted(Vertex v) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalGaussianCurvature(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto ngc = Vector3::zero();
+
+    for(const auto& he : v.outgoingHalfedges()){
+
+        auto x = vertexPositions[he.tipVertex().getIndex()] - vertexPositions[v.getIndex()];
+        double dAngle = dihedralAngle(he);
+        ngc += dAngle * x.normalize();
+
+    }
+
+    return ngc.normalize();
 }
 
 /*
@@ -256,8 +265,17 @@ Vector3 VertexPositionGeometry::vertexNormalGaussianCurvature(Vertex v) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalMeanCurvature(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto nmc = Vector3::zero();
+
+    for(const auto& he : v.outgoingHalfedges()){
+
+        auto x = vertexPositions[he.tipVertex().getIndex()] - vertexPositions[v.getIndex()];
+        double cotans = cotan(he) + cotan(he.twin());
+        nmc += cotans*x;
+
+    }
+
+    return nmc.normalize();
 }
 
 /*

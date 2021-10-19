@@ -64,8 +64,22 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar0Form() const {
  */
 SparseMatrix<double> VertexPositionGeometry::buildHodgeStar1Form() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto e : mesh.edges()){
+
+        double cot1 = VertexPositionGeometry::cotan(e.halfedge());
+        double cot2 = VertexPositionGeometry::cotan(e.halfedge().twin());
+
+        double value = (cot1 + cot2) / 2;
+        triplets.push_back(T(e.getIndex(), e.getIndex(), value ));
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nEdges(), mesh.nEdges());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*

@@ -46,11 +46,20 @@ void SimplicialComplexOperators::assignElementIndices() {
  */
 SparseMatrix<size_t> SimplicialComplexOperators::buildVertexEdgeAdjacencyMatrix() const {
 
-    // TODO
-    // Note: You can build an Eigen sparse matrix from triplets, then return it as a Geometry Central SparseMatrix.
-    // See <https://eigen.tuxfamily.org/dox/group__TutorialSparse.html> for documentation.
+    // SparseMatrix elements are i,j,value triplets
+    typedef Eigen::Triplet<size_t> T;
+    std::vector<T> triplets;
 
-    return identityMatrix<size_t>(1); // placeholder
+    for(auto e : mesh->edges()){
+        triplets.push_back(T(e.getIndex(), e.firstVertex().getIndex(), 1));
+        triplets.push_back(T(e.getIndex(), e.secondVertex().getIndex(), 1));
+    }
+
+    Eigen::SparseMatrix<size_t> sparseMatrix(mesh->nEdges(), mesh->nVertices());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    
+    return sparseMatrix;
 }
 
 /*

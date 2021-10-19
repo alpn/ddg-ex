@@ -286,8 +286,13 @@ Vector3 VertexPositionGeometry::vertexNormalMeanCurvature(Vertex v) const {
  */
 double VertexPositionGeometry::angleDefect(Vertex v) const {
 
-    // TODO
-    return 0; // placeholder
+    double totalInnerAngle = 0.0;
+
+    for(const auto& c : v.adjacentCorners()){
+        totalInnerAngle += angle(c);
+    }
+
+    return 2*PI - totalInnerAngle;
 }
 
 /*
@@ -298,8 +303,12 @@ double VertexPositionGeometry::angleDefect(Vertex v) const {
  */
 double VertexPositionGeometry::totalAngleDefect() const {
 
-    // TODO
-    return 0; // placeholder
+    double total = 0.0;
+
+    for(const auto& v : mesh.vertices()){
+        total += angleDefect(v);
+    }
+    return total;
 }
 
 /*
@@ -310,8 +319,16 @@ double VertexPositionGeometry::totalAngleDefect() const {
  */
 double VertexPositionGeometry::scalarMeanCurvature(Vertex v) const {
 
-    // TODO
-    return 0; // placeholder
+    double mc = 0.0;
+
+    for(const auto& he : v.outgoingHalfedges()){
+
+        auto x = vertexPositions[he.tipVertex().getIndex()] - vertexPositions[v.getIndex()];
+        mc += dihedralAngle(he)*x.norm();
+
+    }
+
+    return mc/2;
 }
 
 /*

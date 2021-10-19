@@ -135,8 +135,20 @@ SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative0Form() cons
  */
 SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative1Form() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto f : mesh.faces()){
+        for(auto he : f.adjacentHalfedges()){
+            double orientation = he.orientation() ? 1 : -1;
+            triplets.push_back(T(f.getIndex(), he.edge().getIndex(), orientation));
+        }
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nFaces(), mesh.nEdges());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 } // namespace surface

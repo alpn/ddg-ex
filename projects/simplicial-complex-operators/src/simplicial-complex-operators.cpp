@@ -70,8 +70,20 @@ SparseMatrix<size_t> SimplicialComplexOperators::buildVertexEdgeAdjacencyMatrix(
  */
 SparseMatrix<size_t> SimplicialComplexOperators::buildFaceEdgeAdjacencyMatrix() const {
 
-    // TODO
-    return identityMatrix<size_t>(1); // placeholder
+    // SparseMatrix elements are i,j,value triplets
+    typedef Eigen::Triplet<size_t> T;
+    std::vector<T> triplets;
+
+    for(auto f : mesh->faces()){
+        for(auto e : f.adjacentEdges()){
+            triplets.push_back(T(f.getIndex(), e.getIndex(), 1));
+        }
+    }
+
+    Eigen::SparseMatrix<size_t> sparseMatrix(mesh->nFaces(), mesh->nEdges());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*

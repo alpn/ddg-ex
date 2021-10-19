@@ -322,6 +322,47 @@ int SimplicialComplexOperators::isPureComplex(const MeshSubset& subset) const {
  */
 MeshSubset SimplicialComplexOperators::boundary(const MeshSubset& subset) const {
 
-    // TODO
-    return subset; // placeholder
+    MeshSubset preboundary;
+
+    uint32_t contained_in = 0;
+
+    for(auto v : subset.vertices){
+
+        contained_in = 0;
+
+        for(auto e : mesh->vertex(v).adjacentEdges()){
+            if(subset.edges.count(e.getIndex())){
+                contained_in++;
+            }
+        }
+
+        for(auto f : mesh->vertex(v).adjacentFaces()){
+            if(subset.faces.count(f.getIndex())){
+                contained_in++;
+            }
+        }
+
+        if(1 == contained_in){
+            preboundary.addVertex(v);
+        }
+
+    }
+
+    for(auto e : subset.edges){
+
+        contained_in = 0;
+
+        for(auto f : mesh->edge(e).adjacentFaces()){
+            if(subset.faces.count(f.getIndex())){
+                contained_in++;
+            }
+        }
+
+        if(1 == contained_in){
+            preboundary.addEdge(e);
+        }
+
+    }
+
+    return closure(preboundary);
 }

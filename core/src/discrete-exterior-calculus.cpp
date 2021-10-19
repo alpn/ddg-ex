@@ -113,8 +113,18 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar2Form() const {
  */
 SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative0Form() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto e : mesh.edges()){
+        triplets.push_back(T(e.getIndex(), e.firstVertex().getIndex(), -1));
+        triplets.push_back(T(e.getIndex(), e.secondVertex().getIndex(), 1));
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nEdges(), mesh.nVertices());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*

@@ -144,8 +144,16 @@ double VertexPositionGeometry::angle(Corner c) const {
  */
 double VertexPositionGeometry::dihedralAngle(Halfedge he) const {
 
-    // TODO
-    return 0; // placeholder
+    auto n1 = faceNormals[he.face().getIndex()];
+    auto n2 = faceNormals[he.twin().face().getIndex()];
+
+    auto E = vertexPositions[he.tipVertex().getIndex()] - vertexPositions[he.tailVertex().getIndex()];
+    auto e = E.normalize();
+
+    auto c = cross(n1,n2);
+    auto d = dot(n1,n2);
+
+    return atan2(dot(e, c), dot(n1,n2));
 }
 
 /*

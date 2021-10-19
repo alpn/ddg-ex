@@ -80,8 +80,22 @@ double VertexPositionGeometry::totalArea() const {
  */
 double VertexPositionGeometry::cotan(Halfedge he) const {
 
-    // TODO
-    return 0; // placeholder
+    size_t v1 = he.tipVertex().getIndex();
+    size_t v2 = he.tailVertex().getIndex();
+
+    size_t v3 = he.next().tipVertex().getIndex();
+
+    assert(v1!=v2);
+    assert(v1!=v3);
+    assert(v2!=v3);
+
+    auto u = vertexPositions[v1] - vertexPositions[v3];
+    auto v = vertexPositions[v2] - vertexPositions[v3];
+
+    double denominator = cross(u,v).norm();
+    assert(0!=denominator);
+
+    return dot(u,v) / denominator;
 }
 
 /*

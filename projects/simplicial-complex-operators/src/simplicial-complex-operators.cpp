@@ -154,8 +154,24 @@ Vector<size_t> SimplicialComplexOperators::buildFaceVector(const MeshSubset& sub
  */
 MeshSubset SimplicialComplexOperators::star(const MeshSubset& subset) const {
 
-    // TODO
-    return subset; // placeholder
+    auto star(subset);
+
+    for(auto v : subset.vertices){
+        for(auto e : mesh->vertex(v).adjacentEdges()){
+            star.edges.insert(e.getIndex());
+        }
+        for(auto f : mesh->vertex(v).adjacentFaces()){
+            star.faces.insert(f.getIndex());
+        }
+    }
+
+    for(auto e : subset.edges){
+        for(auto f : mesh->edge(e).adjacentFaces()){
+            star.faces.insert(f.getIndex());
+        }
+    }
+
+    return star;
 }
 
 

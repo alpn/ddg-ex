@@ -90,8 +90,19 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar1Form() const {
  */
 SparseMatrix<double> VertexPositionGeometry::buildHodgeStar2Form() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto f : mesh.faces()){
+
+        double value = 1/VertexPositionGeometry::faceArea(f);
+        triplets.push_back(T(f.getIndex(), f.getIndex(), value ));
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nFaces(), mesh.nFaces());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*

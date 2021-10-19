@@ -164,8 +164,13 @@ double VertexPositionGeometry::dihedralAngle(Halfedge he) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalEquallyWeighted(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto n = Vector3::zero();
+
+    for(const auto& f : v.adjacentFaces()){
+        n+=faceNormals[f.getIndex()];
+    }
+
+    return n.normalize();
 }
 
 /*
@@ -176,8 +181,14 @@ Vector3 VertexPositionGeometry::vertexNormalEquallyWeighted(Vertex v) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalAngleWeighted(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto n = Vector3::zero();
+
+    for(const auto& c : v.adjacentCorners()){
+        double ang = angle(c);
+        n+= ang * faceNormals[c.face().getIndex()];
+    }
+
+    return n.normalize();
 }
 
 /*
@@ -188,8 +199,24 @@ Vector3 VertexPositionGeometry::vertexNormalAngleWeighted(Vertex v) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalSphereInscribed(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto nsi = Vector3::zero();
+
+    for(const auto& c : v.adjacentCorners()){
+
+        auto he1 = c.halfedge();
+        auto he2 = c.halfedge().next().next();
+
+        auto e1 = vertexPositions[he1.tipVertex().getIndex()] - vertexPositions[v.getIndex()];
+        auto e2 = vertexPositions[he2.tailVertex().getIndex()] - vertexPositions[v.getIndex()];
+ 
+        double denominator = e1.norm2()*e2.norm2();
+        assert(0!=denominator);
+
+        nsi += cross(e1,e2)/denominator;
+
+    }
+
+    return nsi.normalize();
 }
 
 /*
@@ -200,8 +227,13 @@ Vector3 VertexPositionGeometry::vertexNormalSphereInscribed(Vertex v) const {
  */
 Vector3 VertexPositionGeometry::vertexNormalAreaWeighted(Vertex v) const {
 
-    // TODO
-    return {0, 0, 0}; // placeholder
+    auto n = Vector3::zero();
+
+    for(const auto& f : v.adjacentFaces()){
+        n+= faceAreas[f.getIndex()] * faceNormals[f.getIndex()];
+    }
+
+    return n.normalize();
 }
 
 /*

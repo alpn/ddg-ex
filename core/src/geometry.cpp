@@ -339,8 +339,20 @@ double VertexPositionGeometry::scalarMeanCurvature(Vertex v) const {
  */
 double VertexPositionGeometry::circumcentricDualArea(Vertex v) const {
 
-    // TODO
-    return 0; // placeholder
+    double cca = 0.0;
+
+    for(const auto& c : v.adjacentCorners()){
+
+        auto he1 = c.halfedge();
+        auto he2 = c.halfedge().next().next();
+
+        auto e1 = vertexPositions[he1.tipVertex().getIndex()] - vertexPositions[v.getIndex()];
+        auto e2 = vertexPositions[he2.tailVertex().getIndex()] - vertexPositions[v.getIndex()];
+
+        cca += (e1.norm2()*cotan(he1) + e2.norm2()*cotan(he2));
+    }
+
+    return cca/8;
 }
 
 /*
@@ -351,10 +363,20 @@ double VertexPositionGeometry::circumcentricDualArea(Vertex v) const {
  */
 std::pair<double, double> VertexPositionGeometry::principalCurvatures(Vertex v) const {
 
-    // TODO
-    return std::make_pair(0, 0); // placeholder
-}
+    double H = scalarMeanCurvature(v) / circumcentricDualArea(v);
+    double K = angleDefect(v) / circumcentricDualArea(v);
 
+    double sq = sqrt(H*H - K);
+
+    double k1 = H + sq;
+    double k2 = H - sq;
+
+    double kmin = std::min(k1,k2);
+    double kmax = std::max(k1,k2); 
+
+    return std::make_pair(kmin, kmax);
+
+}
 
 /*
  * Builds the sparse POSITIVE DEFINITE Laplace matrix. Do this by building the negative semidefinite Laplace matrix,

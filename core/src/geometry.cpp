@@ -387,8 +387,30 @@ std::pair<double, double> VertexPositionGeometry::principalCurvatures(Vertex v) 
  */
 SparseMatrix<double> VertexPositionGeometry::laplaceMatrix() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto i : mesh.vertices()){
+
+        double ii_val = 0.0;
+
+        for(auto he : i.outgoingHalfedges()){
+            
+            double half_cot_sum = edgeCotanWeight(he.edge());
+            double ij_val = -1.0 * half_cot_sum; 
+            ii_val += half_cot_sum;
+
+            auto j = he.tipVertex();
+            triplets.push_back(T(i.getIndex(), j.getIndex(), ij_val ));
+        }
+
+        triplets.push_back(T(i.getIndex(), i.getIndex(), ii_val + 1e-8));
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nVertices(), mesh.nVertices());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*
@@ -399,8 +421,20 @@ SparseMatrix<double> VertexPositionGeometry::laplaceMatrix() const {
  */
 SparseMatrix<double> VertexPositionGeometry::massMatrix() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    //NOTE: this is exactly like buildHodgeStar0Form()
+
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+
+    for(auto v : mesh.vertices()){
+        double value = VertexPositionGeometry::barycentricDualArea(v);
+        triplets.push_back(T(v.getIndex(), v.getIndex(), value ));
+    }
+
+    Eigen::SparseMatrix<double> sparseMatrix(mesh.nVertices(), mesh.nVertices());
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    return sparseMatrix;
 }
 
 /*

@@ -134,8 +134,16 @@ Vector<size_t> SimplicialComplexOperators::buildEdgeVector(const MeshSubset& sub
  */
 Vector<size_t> SimplicialComplexOperators::buildFaceVector(const MeshSubset& subset) const {
 
-    // TODO
-    return Vector<size_t>::Zero(1);
+    Vector<size_t> faces (mesh->nFaces());
+    for(size_t i=0; i < mesh->nFaces(); i++){
+        if(subset.edges.count(i)){
+            faces[i]=1;
+        }
+        else{
+            faces[i]=0;
+        }
+    }
+    return faces;
 }
 
 /*

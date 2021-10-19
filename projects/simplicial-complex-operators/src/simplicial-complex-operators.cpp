@@ -231,8 +231,31 @@ MeshSubset SimplicialComplexOperators::link(const MeshSubset& subset) const {
  */
 bool SimplicialComplexOperators::isComplex(const MeshSubset& subset) const {
 
-    // TODO
-    return false; // placeholder
+    for(auto e : subset.edges){
+        for(auto v : mesh->edge(e).adjacentVertices()){
+            if(0 == subset.vertices.count(v.getIndex())){
+                return false;
+            }
+        }
+    }
+
+    for(auto f : subset.faces){
+
+        for(auto v : mesh->face(f).adjacentVertices()){
+            if(0 == subset.vertices.count(v.getIndex())){
+                return false;
+            }
+        }
+
+        for(auto e : mesh->face(f).adjacentEdges()){
+            if(0 == subset.edges.count(e.getIndex())){
+                return false;
+            }
+        }
+
+    }
+
+    return true;
 }
 
 /*

@@ -123,8 +123,17 @@ double VertexPositionGeometry::barycentricDualArea(Vertex v) const {
  */
 double VertexPositionGeometry::angle(Corner c) const {
 
-    // TODO
-    return 0; // placeholder
+    auto v1 = c.vertex().getIndex();
+    auto v2 = c.halfedge().tipVertex().getIndex();
+    auto v3 = c.halfedge().next().tipVertex().getIndex();
+
+    const auto u = vertexPositions[v2] - vertexPositions[v1];
+    const auto v = vertexPositions[v3] - vertexPositions[v1];
+
+    double denominator = norm(u)*norm(v);
+    assert(0!= denominator);
+
+    return clamp(acos(dot(u,v) / denominator), 0.0, PI);
 }
 
 /*

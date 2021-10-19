@@ -94,8 +94,16 @@ SparseMatrix<size_t> SimplicialComplexOperators::buildFaceEdgeAdjacencyMatrix() 
  */
 Vector<size_t> SimplicialComplexOperators::buildVertexVector(const MeshSubset& subset) const {
 
-    // TODO
-    return Vector<size_t>::Zero(1);
+    Vector<size_t> vertices (mesh->nVertices());
+    for(size_t i=0; i < mesh->nVertices(); i++){
+        if(subset.vertices.count(i)){
+            vertices[i]=1;
+        }
+        else{
+            vertices[i]=0;
+        }
+    }
+    return vertices;
 }
 
 /*

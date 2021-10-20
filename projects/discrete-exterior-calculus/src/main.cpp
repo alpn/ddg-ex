@@ -814,6 +814,8 @@ int main(int argc, char** argv) {
     // Load mesh
     std::tie(mesh, geometry) = readManifoldSurfaceMesh(filepath);
 
+    geometry->requireVertexPositions();
+
     if (!isPlanar()) {
         std::cerr << "Please load a planar mesh with zero Z component" << std::endl;
         return EXIT_FAILURE;

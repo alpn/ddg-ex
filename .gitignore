@@ -34,3 +34,7 @@
 
 # Mac
 **/*.DS_Store
+
+.vscode/*
+# Local History for Visual Studio Code
+.history/

@@ -1,4 +1,3 @@
-// Implement member functions HeatMethod class.
 #include "heat-method.h"
 
 using namespace geometrycentral;
@@ -12,10 +11,14 @@ HeatMethod::HeatMethod(ManifoldSurfaceMesh* surfaceMesh, VertexPositionGeometry*
     this->mesh = surfaceMesh;
     this->geometry = geo;
 
-    // TODO: Build Laplace and flow matrices.
-    // Note: core/geometry.cpp has meanEdgeLength() function
-    this->A = identityMatrix<double>(1); // placeholder
-    this->F = identityMatrix<double>(1); // placeholder
+    geo->requireVertexPositions();
+
+    this->A = geo->laplaceMatrix();
+
+    SparseMatrix<double> M = geometry->massMatrix();
+    double h = geo->meanEdgeLength();
+    double dt = h*h;
+    this->F = M + dt*this->A;
 }
 
 /*

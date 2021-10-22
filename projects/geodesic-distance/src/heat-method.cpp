@@ -78,8 +78,32 @@ FaceData<Vector3> HeatMethod::computeVectorField(const Vector<double>& u) const 
  */
 Vector<double> HeatMethod::computeDivergence(const FaceData<Vector3>& X) const {
 
-    // TODO
-    return Vector<double>::Zero(1); // placeholder
+    Vector<double> result(mesh->nVertices());
+
+    for(const auto v : mesh->vertices()){
+
+        double integratedDivAtV = 0.0;
+
+        for(const auto he1 : v.outgoingHalfedges()){
+
+            const auto Xf = X[he1.face()];
+            const auto he2 = he1.next().next();
+
+            const auto e1 = geometry->vertexPositions[he1.tipVertex().getIndex()]-
+                            geometry->vertexPositions[v.getIndex()];
+
+            const auto e2 = geometry->vertexPositions[he2.tailVertex().getIndex()]-
+                            geometry->vertexPositions[v.getIndex()];
+
+            integratedDivAtV += 0.5 *
+                            (geometry->cotan(he1) * dot(e1,Xf) +
+                             geometry->cotan(he2) * dot(e2,Xf));
+        }
+
+        result[v.getIndex()] = integratedDivAtV;
+    }
+
+    return result;
 }
 
 /*

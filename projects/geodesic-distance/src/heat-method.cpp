@@ -30,8 +30,44 @@ HeatMethod::HeatMethod(ManifoldSurfaceMesh* surfaceMesh, VertexPositionGeometry*
  */
 FaceData<Vector3> HeatMethod::computeVectorField(const Vector<double>& u) const {
 
-    // TODO
-    return FaceData<Vector3>(*mesh, {0, 0, 0}); // placeholder
+    const auto u0 = u;
+    SparseMatrix<double> FL = F;
+    Vector<double> ut = geometrycentral::solvePositiveDefinite(FL, u0);
+
+    auto faceData = FaceData<Vector3>(*mesh, {0, 0, 0});
+
+    for(const auto& f : mesh->faces()){
+
+        const auto he = f.halfedge();
+
+        size_t v1 = he.tipVertex().getIndex();
+        size_t v2 = he.tailVertex().getIndex();
+        size_t v3 = he.next().tipVertex().getIndex();
+
+        const auto e1 = geometry->vertexPositions[v3]-geometry->vertexPositions[v2];
+        const auto e2 = geometry->vertexPositions[v1]-geometry->vertexPositions[v3];
+        const auto e3 = geometry->vertexPositions[v2]-geometry->vertexPositions[v1];
+
+        auto N = geometry->faceNormal(f);
+
+        auto sum =
+            u[v1]*(cross(N,e1)) +
+            u[v2]*(cross(N,e2)) +
+            u[v3]*(cross(N,e3));
+
+        double denominator = 2 * geometry->faceArea(f);
+        assert(0 != denominator);
+
+        const auto preX = sum / denominator;
+
+        if(preX.norm() > 0){
+
+            const auto X = preX.normalize();
+            faceData[f] = X;
+        }
+    }
+
+    return faceData;
 }
 
 /*

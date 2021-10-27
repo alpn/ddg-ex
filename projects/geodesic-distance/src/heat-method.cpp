@@ -15,10 +15,9 @@ HeatMethod::HeatMethod(ManifoldSurfaceMesh* surfaceMesh, VertexPositionGeometry*
 
     this->A = geo->laplaceMatrix();
 
-    SparseMatrix<double> M = geometry->massMatrix();
     double h = geo->meanEdgeLength();
     double dt = h*h;
-    this->F = M + dt*this->A;
+    this->F = geometry->massMatrix() + dt*this->A;
 }
 
 /*
@@ -29,10 +28,6 @@ HeatMethod::HeatMethod(ManifoldSurfaceMesh* surfaceMesh, VertexPositionGeometry*
  * Returns: A MeshData container that stores a Vector3 per face.
  */
 FaceData<Vector3> HeatMethod::computeVectorField(const Vector<double>& u) const {
-
-    const auto u0 = u;
-    SparseMatrix<double> FL = F;
-    Vector<double> ut = geometrycentral::solvePositiveDefinite(FL, u0);
 
     auto faceData = FaceData<Vector3>(*mesh, {0, 0, 0});
 
@@ -114,8 +109,16 @@ Vector<double> HeatMethod::computeDivergence(const FaceData<Vector3>& X) const {
  */
 Vector<double> HeatMethod::compute(const Vector<double>& delta) const {
 
-    // TODO
-    Vector<double> phi = Vector<double>::Zero(delta.rows());
+    const auto u0 = delta;
+    SparseMatrix<double> FL = F;
+    Vector<double> ut = geometrycentral::solvePositiveDefinite(FL, u0);
+
+    FaceData<Vector3> X = computeVectorField(ut);
+    Vector<double> div = computeDivergence(X);
+
+    SparseMatrix<double> Lc = this->A;
+    Vector<double> b = -1.0*div;
+    Vector<double> phi = geometrycentral::solvePositiveDefinite(Lc, b);
 
     // Since φ is unique up to an additive constant, it should be shifted such that the smallest distance is zero
     this->subtractMinimumDistance(phi);

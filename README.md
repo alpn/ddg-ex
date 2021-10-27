@@ -5,7 +5,7 @@ C++ solutions for [Discrete Differential Geometry Exercises](https://github.com/
 - [ ] direction-field-design           
 - [ ] vector-field-decomposition 
 - [ ] parameterization  
-- [ ] geodesic-distance           
+- [x] geodesic-distance
 - [x] geometric-flow    
 - [x] poisson-problem               
 - [x] discrete-curvatures-and-normals  

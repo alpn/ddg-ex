@@ -95,6 +95,8 @@ class HeatMethodTest : public ::testing::Test {
         std::unique_ptr<ManifoldSurfaceMesh> mesh;
         std::unique_ptr<VertexPositionGeometry> geometry;
         std::tie(mesh, geometry) = makeManifoldSurfaceMeshAndGeometry(vMat, fMat);
+        geometry->requireVertexPositions();
+
         HM = HeatMethod(mesh.release(), geometry.release());
 
         delta = Vector<double>::Zero(HM.mesh->nVertices());

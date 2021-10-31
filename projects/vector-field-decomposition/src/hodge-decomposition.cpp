@@ -10,11 +10,10 @@ HodgeDecomposition::HodgeDecomposition(ManifoldSurfaceMesh* inputMesh, VertexPos
     mesh = inputMesh;
     geometry = inputGeo;
 
-    // TODO: build DEC operators
-    this->hodge1 = identityMatrix<double>(1); // placeholder
-    this->hodge2 = identityMatrix<double>(1); // placeholder
-    this->d0 = identityMatrix<double>(1);     // placeholder
-    this->d1 = identityMatrix<double>(1);     // placeholder
+    this->hodge1 = geometry->buildHodgeStar1Form();
+    this->hodge2 = geometry->buildHodgeStar2Form();
+    this->d0 = geometry->buildExteriorDerivative0Form();
+    this->d1 = geometry->buildExteriorDerivative1Form();
 
     // TODO: Build operator inverses.
     // Hint: Use the sparseInverseDiagonal() in utils/src/solvers.cpp to invert sparse diagonal matrices.
